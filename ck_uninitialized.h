@@ -13,7 +13,7 @@
 /************************************************************************/
 namespace CK_STL
 {
-	template<class InputIterator class ForwardInterator>
+	template<class InputIterator ,class ForwardInterator>
 	ForwardInterator _uninitialized_copy_aux(InputIterator first, InputIterator last, ForwardInterator result, _true_type)
 	{
 		return copy(first, last, result);
@@ -97,7 +97,7 @@ namespace CK_STL
 	}
 
 	template<class ForwardInterator, class Size, class T>
-	inline ForwardInterator uninitialized_fill_n(ForwardInterator first, Size n; const T x)
+	inline ForwardInterator uninitialized_fill_n(ForwardInterator first, Size n, const T& x)
 	{
 		typedef typename _type_traits<T>::is_POD_type isPODType;
 		return _uninitialized_fill_n_aux(first, n, x, isPODType);
