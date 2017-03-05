@@ -87,5 +87,38 @@ namespace CK_STL
 		}
 		return result;
 	}
+	//fill&fill_n
+	template<class ForwardInterator,class T>
+	void fill(ForwardInterator first, ForwardInterator last, const T& value)
+	{
+		for (; first != last; ++first)
+			*first = value; //直接简单拷贝
+	}
+	template<class OutputIterator,class Size,class T>
+	OutputIterator fill_n(OutputIterator first, Size n, const T& value)
+	{
+		for (; n > 0; --n; ++first)
+			*first = value;
+		return first;
+	}
+	//对(unsigned)char的特殊处理
+	inline void fill(unsigned char* first, unsigned char* last, const unsigned char& c)
+	{
+		unsigned char tmp = c;
+		memset(first, tmp, last - first);
+	}
+
+	inline void fill(signed char* first, signed char* last, const signed char& c)
+	{
+		signed char tmp = c;
+		memset(first, static_cast<unsigned char>(tmp), last - first);
+	}
+
+	inline void fill(char* first, char* last, const  char& c)
+	{
+		char tmp = c;
+		memset(first, static_cast<unsigned char>(tmp), last - first);
+	}
+
 }
 #endif

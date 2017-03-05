@@ -97,10 +97,6 @@ namespace CK_STL
 			return result;
 		}
 	public:
-		//容器状态
-		size_type size()const{ return static_cast<size_type>(end() - begin()); }
-		size_type capacity()const{ return static_cast<size_type>(end_of_storage - begin()); }
-		bool empty() const { return begin() == end(); }
 
 		//构造函数
 		vector() :start(nullptr), finish(nullptr), end_of_storage(nullptr){}
@@ -116,6 +112,11 @@ namespace CK_STL
 			deallocate();
 		}
 
+		//容器状态
+		size_type size()const{ return static_cast<size_type>(end() - begin()); }
+		size_type capacity()const{ return static_cast<size_type>(end_of_storage - begin()); }
+		bool empty() const { return begin() == end(); }
+
 		//插入与删除
 		void push_back(const T& x)
 		{
@@ -127,7 +128,6 @@ namespace CK_STL
 			else
 				insert_aux(end(), x);
 		}
-
 		void pop_back()
 		{
 			if (!size())
@@ -135,12 +135,68 @@ namespace CK_STL
 			--finish;
 			destroy(finish);
 		}
-		void resize(size_type new_size, const T& x);
-		void resize(size_type new_size){ resize(new_size, T()); }
-		void clear(){ erase(begin(), end()); }
-		iterator erase(iterator position);
+		void insert(iterator position, size_type n, const T& x) //在position处插入n个x
+		{
+			if (n != 0)
+			{
+				if (size_type(end_of_storage - finish) >= n) //备用空间足够
+				{
+					T x_copy = x;
+					const size_type elems_after = finish - position; //插入点之后的元素个数
+					iterator old_finish = finish;
+					if (elems_after > n) //插入点之后的元素个数大于新增元素个数
+					{
+						uninitialized_copy(finish - n, finish, finish);
+						finish += n;
+						copy_backward(position, old_finish - n, old_finish);
+						fill(position, position + n, x_copy);
+					}
+					else
+					{
+						uninitialized_fill_n(finish, n - elems_after, x_copy);
+						finish += (n - elems_after);
+						uninitialized_copy(position, old_finish), finish);
+						finish += elems_after;
+						fill(position, old_finish, x_copy);
+					}
+				}
+				else //备用空间不足
+				{
+					const size_type old_size = size();
+					const size_type new_size = old_size + max(old_size, n);
+					iterator new_start = data_allocator::allocate(new_size);
+					iterator new_finish = new_start;
+					new_finish = uninitialized_copy(start, position, new_start);
+					new_finish = uninitialized_fill_n(new_finish, n, x);
+					new_finish = uninitialized_copy(position, finish, new_finish);
 
-		//capacity调整
+					destroy(start, finish);
+					deallocate();
+					start = new_start;
+					finish = new_finish;
+					end_of_storage = new_start + new_size;
+				}
+			}
+		}
+		void erase(iterator position) //单个元素
+		{
+			if (position + 1 != end())
+			{
+				copy(position + 1, finish, position);
+			}
+			--finish; 
+			destroy(finish); 
+			return position;
+		}
+		void erase(iterator first, iterator last)
+		{
+			iterator i = copy(last, finish, start);
+			destroy(i, finish);
+			finish = finish-(last-first); // finish = i;
+			return first;
+
+		}
+		//容器调整
 		void reserve(size_type n) //容器预留空间(不构造)
 		{
 			if (n < capacity()) 
@@ -166,19 +222,95 @@ namespace CK_STL
 			start = new_start;
 			end_of_storage = finish;
 		}
+		void resize(size_type new_size, const T& x)
+		{
+			if (new_size < size()) //将多的析构
+			{
+				erase(begin() + new_size, end());
+			}
+			else
+			{
+				insert(end(), new_size - size(), x);
+			}
+		}
+		void resize(size_type new_size){ resize(new_size, T()); }
+		void clear(){ erase(begin(), end()); }
 
 		//赋值
 		self& operator=(const self& v)
 		{
-
+			if (this != &v)
+			{
+				const size_type len = v.size();
+				if (len > capacity()) //容量不够
+				{
+					iterator tmp=allocate_and_copy(len,v.begin(), v.end());
+					destroy(start, finish);
+					deallocate();
+					start = tmp;
+					end_of_storage = start + len;
+				}
+				else if (size() >= len)
+				{
+					iterator i = copy(v.begin(), v.end(), begin());
+					destroy(i, finish); //多余的部分
+				}
+				else
+				{
+					copy(v.begin(), v.begin() + size(), start);
+					uninitialized_copy(v.begin() + size(), v.end(), finish);
+				}
+				finish = start + len;
+			}
+			return *this;
 		}
 		self& operator=(self&& v)
 		{
-
+			if (this != &v)
+			{
+				destroy(start, finish);
+				deallocate();
+				start = v.start;
+				finish = v.finish;
+				end_of_storage = v.end_of_storage;
+				v.start = v.finish = v.end_of_storage = 0;
+			}
+			return *this;
 		}
+		//容器比较
+		inline friend  bool operator==(const self& v1, const self& v2)
+		{
+			return (v1.size() == v2.size() && equal(v1.begin(), v1.end(), v2.begin()));
+		}
+		inline friend bool operator!=(const self& v1, const self& v2)
+		{
+			return !(v1 == v2);
+		}
+		inline friend bool operator<(const self& v1, const self& v2)
+		{
+			return lexicographical_compare(v1.begin(), v1.end(), v2.begin(), v2.end());
+		}
+		inline friend bool operator>(const self& v1, const self& v2)
+		{
+			return (v2<v1);
+		}
+		inline friend  bool operator<=(const self& v1, const self& v2)
+		{
+			return !(v1 > v2);
+		}
+		inline friend bool operator>=(const self& v1, const self& v2)
+		{
+			return !(v1 < v2);
+		}
+		//交换
 		void swap(self& v)
 		{
-
+			if (this != &v)
+			{
+				swap(start, v.start);
+				swap(finish, v.finish);
+				swap(end_of_storage, v.end_of_storage);
+			}
 		}
 
 		//元素访问

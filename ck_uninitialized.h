@@ -5,12 +5,7 @@
 #include "ck_type_traits.h"
 #include "ck_iterator.h"
 #include "ck_algorithm.h"
-/************************************************************************/
-/*	将[first,last)区间内的数据copy到dest开始的内存中
-1.根据数据类型而做不同的拷贝策略
-2.并添加const char*和const wchar_t*两种特化版本
-*/
-/************************************************************************/
+
 namespace CK_STL
 {
 	template<class InputIterator ,class ForwardInterator>
