@@ -95,7 +95,7 @@ namespace CK_STL
 	inline ForwardInterator uninitialized_fill_n(ForwardInterator first, Size n, const T& x)
 	{
 		typedef typename _type_traits<T>::is_POD_type isPODType;
-		return _uninitialized_fill_n_aux(first, n, x, isPODType);
+		return _uninitialized_fill_n_aux(first, n, x, isPODType());
 	}
 }
 #endif

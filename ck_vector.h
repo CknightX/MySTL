@@ -155,7 +155,7 @@ namespace CK_STL
 					{
 						uninitialized_fill_n(finish, n - elems_after, x_copy);
 						finish += (n - elems_after);
-						uninitialized_copy(position, old_finish), finish);
+						uninitialized_copy(position, old_finish, finish);
 						finish += elems_after;
 						fill(position, old_finish, x_copy);
 					}
@@ -178,7 +178,7 @@ namespace CK_STL
 				}
 			}
 		}
-		void erase(iterator position) //单个元素
+		iterator erase(iterator position) //单个元素
 		{
 			if (position + 1 != end())
 			{
@@ -188,7 +188,7 @@ namespace CK_STL
 			destroy(finish); 
 			return position;
 		}
-		void erase(iterator first, iterator last)
+		iterator erase(iterator first, iterator last)
 		{
 			iterator i = copy(last, finish, start);
 			destroy(i, finish);

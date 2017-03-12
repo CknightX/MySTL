@@ -78,7 +78,7 @@ namespace CK_STL
 	}
 
 	//copy_backward
-	template<class BidirectionalIterator1,class BidirectionalIterator2>
+	template<class BidirectionalIterator1, class BidirectionalIterator2>
 	inline BidirectionalIterator2 copy_backward(BidirectionalIterator1 first, BidirectionalIterator1 last, BidirectionalIterator2 result)
 	{
 		while (first != last)
@@ -88,16 +88,16 @@ namespace CK_STL
 		return result;
 	}
 	//fill&fill_n
-	template<class ForwardInterator,class T>
+	template<class ForwardInterator, class T>
 	void fill(ForwardInterator first, ForwardInterator last, const T& value)
 	{
 		for (; first != last; ++first)
 			*first = value; //Ö±½Ó¼òµ¥¿½±´
 	}
-	template<class OutputIterator,class Size,class T>
+	template<class OutputIterator, class Size, class T>
 	OutputIterator fill_n(OutputIterator first, Size n, const T& value)
 	{
-		for (; n > 0; --n; ++first)
+		for (; n > 0; --n, ++first)
 			*first = value;
 		return first;
 	}
@@ -119,6 +119,54 @@ namespace CK_STL
 		char tmp = c;
 		memset(first, static_cast<unsigned char>(tmp), last - first);
 	}
+	template<class T>
+	T max(T a, T b)
+	{
+		return (a > b ? a : b);
+	}
+	template<class T>
+	inline void swap(T&  a, T& b)
+	{
+		T temp = a;
+		a = b;
+		b = temp;
+	}
+	template <class InputIterator1, class InputIterator2>
+	bool lexicographical_compare(InputIterator1 first1, InputIterator1 last1,
+		InputIterator2 first2, InputIterator2 last2)
+	{
+		while (first1 != last1&&first2 != last2)
+		{
+			if (*first1 < *first2)
+			{
+				return true;
+			}
+			if (*first1 > *first2)
+			{
+				return false;
+			}
+		}
+		return first1 == last1&&first2 != last2;
+	}
 
+	template <class InputIterator1, class InputIterator2, class Compare>
+	bool lexicographical_compare(InputIterator1 first1, InputIterator1 last1,
+		InputIterator2 first2, InputIterator2 last2,
+		Compare comp)
+	{
+		while (first1 != last1&&first2 != last2)
+		{
+			if (comp(*first1, *first2))
+			{
+				return true;
+			}
+			if (comp(*first2, *first1))
+			{
+				return false;
+			}
+		}
+		return first1 == last1&&first2 != last2;
+
+	}
 }
 #endif
