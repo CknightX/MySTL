@@ -273,13 +273,13 @@ namespace CK_STL
 		{
 			if (node->next == node || node->next->next == node) //只有0或1个元素时不操作
 				return;
-			auto point = end().node->prev;
-			while (begin().node != point)
+			auto point = list_iterator<T>(node->next->next);
+			while (point!=node)
 			{
 				auto tmp = point;
-				auto tmp2 = tmp;
-				--point;
-				transfer(begin(), tmp, ++tmp2);
+				++point;
+				auto tmp2 = point;
+				transfer(begin(), tmp, tmp2);
 			}
 		}
 		void sort()
