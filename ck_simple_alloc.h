@@ -1,8 +1,10 @@
+/*
+为alloc提供标准接口
+*/
 #ifndef _CK_SIMPLE_ALLOC_H
 #define _CK_SIMPLE_ALLOC_H
 namespace CK_STL
 {
-	//为alloc提供标准接口
 	template < class T, class Alloc >
 	class simple_alloc
 	{

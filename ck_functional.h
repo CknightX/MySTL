@@ -1,3 +1,7 @@
+/*
+·Âº¯Êý
+
+*/
 #ifndef _CK_FUNCTIONAL_H
 #define _CK_FUNCTIONAL_H
 namespace CK_STL

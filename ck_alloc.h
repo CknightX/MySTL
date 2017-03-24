@@ -1,3 +1,6 @@
+/*
+¿Õ¼äÅäÖÃÆ÷
+*/
 #ifndef _CK_ALLOC_H
 #define _CK_ALLOC_H
 #include <cstdlib>
