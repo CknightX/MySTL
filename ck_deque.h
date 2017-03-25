@@ -1,5 +1,6 @@
 #ifndef _CK_DEQUE_H
 #define _CK_DEQUE_H
+#include<stddef.h>
 #include "ck_alloc.h"
 #include "ck_simple_alloc.h"
 #include "ck_construct.h"
@@ -32,7 +33,7 @@ namespace CK_STL
 		value_type* last;
 		map_pointer node;
 		deque_iterator() :cur(nullptr), first(nullptr), last(nullptr), node(nullptr){}
-		deque_iterator(value_type* x, map_pointer y) :cur(x), first(*y), last(*y + deque_buf_size()), node(y){}
+		deque_iterator(value_type* x, map_pointer y) :cur(x), first(*y), last(*y + deque_buf_size(0,sizeof(T))), node(y){}
 		deque_iterator(const iterator& x) :cur(x.cur), first(x.first), last(x.last), node(x.node){}
 
 		reference operator*(){ return *cur; }
@@ -157,7 +158,7 @@ namespace CK_STL
 		void reserve_map_at_front(size_type nodes_to_add = 1);
 		void create_map_and_nodes(size_type num_elements);
 		pointer allocate_node(){ return data_allocator::allocate(deque_buf_size(0,sizeof(T))); }
-		void deallocate_node(value_type* p){ data_allocator::deallocate(p, deque_buf_size(0,sizeof(T))); }
+		void deallocate_node(value_type* p){ data_allocator::deallocate(p, (size_type)deque_buf_size(0,sizeof(T))); }
 
 		void push_back_aux(const value_type& v);
 		void push_front_aux(const value_type& v);
@@ -194,7 +195,7 @@ namespace CK_STL
 	};
 
 	
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
+	template<class T, class Alloc, size_t BufSize >
 	typename deque<T, Alloc, BufSize>::iterator deque<T, Alloc, BufSize>::erase(iterator first, iterator last)
 	{
 		if (first == start&&last == finish) //消除区间是整个deque，直接调用clear
@@ -232,8 +233,8 @@ namespace CK_STL
 			return start + elems_before;
 		}
 	}
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
-	typename deque<T, Alloc, BufSize>::iterator deque<T, Alloc, BufSize>::insert_aux(iterator position, const value_type& x)
+	template<class T, class Alloc, size_t BufSize >
+	typename deque<T, Alloc, BufSize>::iterator deque<T, Alloc, BufSize>::insert_aux(iterator pos, const value_type& x)
 	{
 		difference_type index = pos - start; //插入点之前的元素个数
 		value_type x_copy = x;
@@ -263,7 +264,7 @@ namespace CK_STL
 		*pos = x_copy;
 		return pos;
 	}
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
+	template<class T, class Alloc, size_t BufSize >
 	typename deque<T, Alloc, BufSize>::iterator deque<T, Alloc, BufSize>::insert(iterator position, const value_type& x)
 	{
 		if (position.cur == start.cur) //插入点在最前
@@ -283,7 +284,7 @@ namespace CK_STL
 			return insert_aux(position, x);
 		}
 	}
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
+	template<class T, class Alloc, size_t BufSize >
 	typename deque<T, Alloc, BufSize>::iterator deque<T, Alloc, BufSize>::erase(iterator pos)
 	{
 		iterator next = pos;
@@ -301,7 +302,7 @@ namespace CK_STL
 		}
 		return start + index;
 	}
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
+	template<class T, class Alloc, size_t BufSize >
 	void deque<T, Alloc, BufSize>::swap(self& x)
 	{
 		swap(map, x.map);
@@ -309,7 +310,7 @@ namespace CK_STL
 		swap(finish, x.finish);
 	}
 
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
+	template<class T, class Alloc, size_t BufSize >
 	void deque<T, Alloc, BufSize>::pop_front()
 	{
 		if (start.cur != start.last - 1) //第一缓冲区有两个及以上元素
@@ -322,7 +323,7 @@ namespace CK_STL
 			pop_front_aux();
 		}
 	}
-	template<class T, class Alloc = alloc, size_t BufSize = 0>
+	template<class T, class Alloc, size_t BufSize>
 	void deque<T, Alloc, BufSize>::pop_back()
 	{
 		if (finish.cur != finish.first)
@@ -335,7 +336,7 @@ namespace CK_STL
 			pop_back_aux(); //释放缓冲区
 		}
 	}
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
+	template<class T, class Alloc, size_t BufSize >
 	void deque<T, Alloc, BufSize>::push_front(const value_type& t)
 	{
 		if (start.cur != start.first) //当前node尚有备用空间
@@ -348,7 +349,7 @@ namespace CK_STL
 			push_front_aux(t);
 		}
 	}
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
+	template<class T, class Alloc, size_t BufSize >
 	void deque<T, Alloc, BufSize>::push_back(const value_type& t)
 	{
 		if (finish.cur != finish.last - 1) //最后缓冲区尚有2个以上的元素备用空间
@@ -360,14 +361,14 @@ namespace CK_STL
 			push_back_aux(t);
 	}
 
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
+	template<class T, class Alloc, size_t BufSize >
 	void deque<T, Alloc, BufSize>::fill_initialize(size_type n, const value_type& value)
 	{
 		create_map_and_nodes(n); //分配好deque
 		map_pointer cur;
 		try
 		{
-			for (cur = start.node, cur < finish.node; ++cur)
+			for (cur = start.node; cur < finish.node; ++cur)
 			{
 				uninitialized_fill(*cur, *cur + buffer_size(), value);
 			}
@@ -380,7 +381,7 @@ namespace CK_STL
 		}
 	}
 
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
+	template<class T, class Alloc, size_t BufSize >
 	void deque<T, Alloc, BufSize>::create_map_and_nodes(size_type num_elements)
 	{
 		size_type num_nodes = num_elements / buffer_size() + 1; //所需要节点数,如果整除则多分配一个(初始情况下，申请一个节点)
@@ -408,23 +409,23 @@ namespace CK_STL
 		finish.cur = finish.first + num_elements%buffer_size(); //刚好整除时，多分配一个节点。此时让cur指向这多分配的一个节点的起始处
 	}
 	//对map的操作
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
-	void deque<T, Alloc, BufSize>::reserve_map_at_back(size_type nodes_to_add = 1) //尾插无备用空间时对map的操作
+	template<class T, class Alloc, size_t BufSize >
+	void deque<T, Alloc, BufSize>::reserve_map_at_back(size_type nodes_to_add) //尾插无备用空间时对map的操作
 	{
 		if (nodes_to_add > map_size - (finish.node - map + 1)) //备用空间<所需空间
 		{
 			reallocate_map(nodes_to_add, false);
 		}
 	}
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
-	void deque<T, Alloc, BufSize>::reserve_map_at_front(size_type nodes_to_add = 1) //头插无备用空间时对map的操作
+	template<class T, class Alloc, size_t BufSize >
+	void deque<T, Alloc, BufSize>::reserve_map_at_front(size_type nodes_to_add) //头插无备用空间时对map的操作
 	{
 		if (nodes_to_add > start.node - map) //备用空间<所需空间
 		{
 			reallocate_map(nodes_to_add, false);
 		}
 	}
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
+	template<class T, class Alloc, size_t BufSize >
 	void deque<T, Alloc, BufSize>::reallocate_map(size_type nodes_to_add, bool add_at_front)
 	{
 		size_type old_num_nodes = finish.node - start.node + 1;
@@ -454,7 +455,7 @@ namespace CK_STL
 	}
 
 	// push/pop aux
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
+	template<class T, class Alloc, size_t BufSize >
 	void deque<T, Alloc, BufSize>::push_front_aux(const value_type& t)
 	{
 		value_type t_copy = t;
@@ -475,7 +476,7 @@ namespace CK_STL
 		}
 	}
 
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
+	template<class T, class Alloc, size_t BufSize >
 	void deque<T, Alloc, BufSize>::push_back_aux(const value_type& t)
 	{
 		value_type t_copy =t;
@@ -492,7 +493,7 @@ namespace CK_STL
 			deallocate_node(*(finish.node + 1)); //元素插入失败，将新分配的node deallocate
 		}
 	}
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
+	template<class T, class Alloc, size_t BufSize >
 	void deque<T, Alloc, BufSize>::pop_front_aux()
 	{
 		destroy(start.cur);
@@ -500,7 +501,7 @@ namespace CK_STL
 		start.set_node(start.node + 1);
 		start.cur = start.first;
 	}
-	template<class T, class Alloc = alloc, size_t BufSize = 0 >
+	template<class T, class Alloc, size_t BufSize >
 	void deque<T, Alloc, BufSize>::pop_back_aux()
 	{
 		deallocate_node(finish.first);

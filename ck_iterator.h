@@ -124,7 +124,7 @@ namespace CK_STL
 	template <class InputIterator>
 	inline typename iterator_traits<InputIterator>::difference_type _distance(InputIterator first, InputIterator last, input_iterator_tag)
 	{
-		iterator_traits<InputIterator>::difference_type n = 0;
+		typename iterator_traits<InputIterator>::difference_type n = 0;
 		while (first != last)
 		{
 			++first, ++n;

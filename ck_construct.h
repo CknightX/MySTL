@@ -1,6 +1,6 @@
 #ifndef _CK_CONSTRUCT_H
 #define _CK_CONSTRUCT_H
-#include <new.h>
+#include <new>
 #include "ck_type_traits.h"
 namespace CK_STL
 {

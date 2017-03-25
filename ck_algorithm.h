@@ -4,13 +4,15 @@
 #include "ck_type_traits.h"
 namespace CK_STL
 {
+	template<class InputIterator, class OutputIterator>
+	struct _copy_dispatch;
 	//----------------copy----------------
 	//对外接口，完全泛化版本
 	template<class InputIterator, class OutputIterator>
 	inline OutputIterator copy(InputIterator first, InputIterator last, OutputIterator result)
 	{
-		return _copy_dispatch<InputIterator, OutputIterator>()
-			(first, last, result);
+		return _copy_dispatch<InputIterator,OutputIterator>() (first, last, result);
+			
 	}
 
 	//重载形式
