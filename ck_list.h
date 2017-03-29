@@ -24,13 +24,13 @@ namespace CK_STL
 		//constructor
 		list_iterator(link_type x) :node(x){}
 		list_iterator(){}
-		list_iterator(const iterator& x) :node(x.node){}
+		list_iterator(const self& x) :node(x.node){}
 
 		bool operator==(const self& x){ return node == x.node; }
 		bool operator!=(const self& x){ return node != x.node; }
 
-		reference operator*()const{ return (*node).data; }
-		pointer operator->()const{ return &(operator*());}
+		reference operator*(){ return (*node).data; }
+		pointer operator->(){ return &(operator*());}
 
 		self& operator++()
 		{
@@ -69,6 +69,7 @@ namespace CK_STL
 
 
 		typedef T& reference;
+		typedef const T& const_reference;
 		typedef size_t size_type;
 	protected:
 		list_node* node; 
@@ -108,7 +109,7 @@ namespace CK_STL
 		size_type size()const{ return CK_STL::distance(begin(), end()); }
 		reference front(){ return *begin(); }
 		reference back(){ return *(--end()); }
-		void swap(list& x){ CK_STL::swap(node, x.node); }
+		void swap(list& x){ swap(node, x.node); }
 
 		//node con & de & init
 		list_node* alloc_node(){ return node_allocator::allocate(); }
@@ -214,7 +215,7 @@ namespace CK_STL
 					next = first;
 				}
 				else
-					first = mext;
+					first = next;
 			}
 		}
 
