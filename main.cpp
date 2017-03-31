@@ -1,11 +1,19 @@
 #include<iostream>
-#include "ck_deque.h"
+#include "ck_vector.h"
+#include "ck_heap.h"
 using namespace CK_STL;
 int main()
 {
-	deque<int> a;
-	for (int i=0;i<100;++i)
-		a.push_back(i);
-	std::cout<<a.size();
+	vector<int> a;
+	a.push_back(68);
+	a.push_back(31);
+	a.push_back(65);
+	a.push_back(21);
+	a.push_back(24);
+	a.push_back(32);
+	a.push_back(26);
+	a.push_back(19);
+	a.push_back(16);
+	a.push_back(13);
 	return 0;
 }

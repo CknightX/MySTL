@@ -4,6 +4,7 @@
 #include "ck_alloc.h"
 #include "ck_simple_alloc.h"
 #include "ck_functional.h"
+#define TEST
 namespace CK_STL
 {
 	template<class T>
@@ -19,6 +20,10 @@ namespace CK_STL
 	{
 		typedef list_node<T>* link_type;
 		typedef list_iterator self;
+#ifdef TEST
+		typedef T& reference;
+		typedef T* pointer;
+#endif
 		link_type node; //迭代器内部指针，指向list节点
 
 		//constructor
@@ -59,9 +64,8 @@ namespace CK_STL
 	class list
 	{
 	protected:
-		typedef list_node<T> list_node;
-		typedef list_node* link_type;
-		typedef simple_alloc<list_node,Alloc> node_allocator;
+		typedef list_node<T>* link_type;
+		typedef simple_alloc<list_node<T>,Alloc> node_allocator;
 	public:
 		typedef T value_type;
 		typedef list_iterator<T> iterator;
@@ -72,7 +76,7 @@ namespace CK_STL
 		typedef const T& const_reference;
 		typedef size_t size_type;
 	protected:
-		list_node* node; 
+		link_type node; 
 	public:
 		//constructor & destructor
 		void init()
@@ -107,15 +111,15 @@ namespace CK_STL
 
 		bool empty()const{ return node->next == node; }
 		size_type size()const{ return CK_STL::distance(begin(), end()); }
-		reference front(){ return *begin(); }
+		reference front(){ return *(begin()); }
 		reference back(){ return *(--end()); }
 		void swap(list& x){ swap(node, x.node); }
 
 		//node con & de & init
-		list_node* alloc_node(){ return node_allocator::allocate(); }
-		void dealloc_node(list_node* node){ node_allocator::deallocate(node); }
-		list_node* create_node(const T& x){ link_type tmp = alloc_node(); tmp->next = tmp->prev = nullptr; tmp->data = x; return tmp; }
-		void destroy_node(list_node* node){ destroy(&node->data); dealloc_node(node); }
+		link_type alloc_node(){ return node_allocator::allocate(); }
+		void dealloc_node(link_type node){ node_allocator::deallocate(node); }
+		link_type create_node(const T& x){ link_type tmp = alloc_node(); tmp->next = tmp->prev = nullptr; tmp->data = x; return tmp; }
+		void destroy_node(link_type node){ destroy(&node->data); dealloc_node(node); }
 
 		iterator insert(iterator position, const T& x)
 		{
