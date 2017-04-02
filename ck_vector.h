@@ -5,6 +5,7 @@
 #include "ck_uninitialized.h"
 #include "ck_algorithm.h"
 #include "ck_construct.h"
+#include<cstddef>
 namespace CK_STL
 {
 	template < class T, class Alloc = alloc >
@@ -207,7 +208,7 @@ namespace CK_STL
 			{
 				const size_type old_size = size();
 				iterator tmp = allocate_and_copy(n, start, finish);
-				destroy(start, last);
+				destroy(start, finish);
 				deallocate();
 				start = tmp;
 				finish = start + old_size;
