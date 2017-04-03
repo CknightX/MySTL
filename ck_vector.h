@@ -21,6 +21,22 @@ namespace CK_STL
 		typedef size_t size_type;
 		typedef ptrdiff_t difference_type;
 		typedef vector<T, Alloc> self;
+	public:
+		//构造函数
+		vector() :start(nullptr), finish(nullptr), end_of_storage(nullptr){}
+		vector(size_type n, const T& value){ fill_initialize(n, value); }
+		vector(int n, const T& value){ fill_initialize(n, value); }
+		vector(long n, const T& value){ fill_initialize(n, value); }
+		template<class InputIterator>
+		vector(InputIterator first,InputIterator last){allocate_and_copy(first,last);}
+		explicit vector(size_type n){ fill_initialize(n, T()); } //explicit 阻止隐式转换
+
+		//析构函数
+		~vector()
+		{
+			destroy(start, finish);
+			deallocate();
+		}
 	protected:
 		typedef simple_alloc<value_type, Alloc> data_allocator;
 		iterator start;
@@ -99,19 +115,6 @@ namespace CK_STL
 		}
 	public:
 
-		//构造函数
-		vector() :start(nullptr), finish(nullptr), end_of_storage(nullptr){}
-		vector(size_type n, const T& value){ fill_initialize(n, value); }
-		vector(int n, const T& value){ fill_initialize(n, value); }
-		vector(long n, const T& value){ fill_initialize(n, value); }
-		explicit vector(size_type n){ fill_initialize(n, T()); } //explicit 阻止隐式转换
-
-		//析构函数
-		~vector()
-		{
-			destroy(start, finish);
-			deallocate();
-		}
 
 		//容器状态
 		size_type size()const{ return static_cast<size_type>(end() - begin()); }
