@@ -321,7 +321,9 @@ namespace CK_STL
 		reference operator[](const difference_type n){ return *(begin() + n); }
 		const_reference operator[](const difference_type n)const{return *(cbegin() + n); }
 		reference front(){ return *begin(); }
+		const_reference front()const{ return *begin(); }
 		reference back(){ return *(end() - 1); }
+		const_reference back()const{ return *(end() - 1); }
 		pointer data(){ return start; }
 
 		//µü´úÆ÷
