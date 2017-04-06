@@ -1,6 +1,7 @@
 #ifndef _CK_ALGOBASE_H
 #define  _CK_ALGOBASE_H
 
+#include <cstring>
 #include "ck_iterator.h"
 #include "ck_type_traits.h"
 namespace CK_STL
@@ -171,5 +172,13 @@ namespace CK_STL
 		return first1 == last1&&first2 != last2;
 
 	}
+	template<class InputIterator,class T>
+		InputIterator find(InputIterator first,InputIterator last,const T& value)
+		{
+			for (;first!=last;++first)
+				if (*first==value)
+					break;
+			return first;
+		}
 }
 #endif
